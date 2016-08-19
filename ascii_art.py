@@ -42,7 +42,6 @@ class AsciiConverter:
 
             ascii_image.append("")
             for i in range(self.num_columns):
-                # crop image to fit the specific tile
                 x1 = int(i * self.tile_width)
                 x2 = int((i + 1) * self.tile_width)
                 # correct the last tile 
@@ -59,7 +58,7 @@ class AsciiConverter:
                 else:
                     greyscale_value = self.GSCALE2[int((average * 9) / 255)]
                 # append the ASCII character to the string
-                ascii_image[j] += greyscale_value
+                ascii_image[j] += greyscale_value  # TODO GREG slow - update using index
         return ascii_image
 
     def write_to_text_file(self, ascii_image, output_filename):
@@ -86,19 +85,27 @@ def get_image(url):
 
 
 def download_images():
-    urls = [
+    urls = [  # TODO GREG input folder or arguments
         # good:
         'https://i.redd.it/707zkx33v1gx.jpg',
         'https://pixabay.com/static/uploads/photo/2013/08/11/19/37/flower-171644_960_720.jpg',
         'https://www.nostarch.com/sites/default/files/imagecache/product_full/pythonplay_cover-front_new.png',
+        'http://wiki.gamedetectives.net/images/b/bf/Overwatch_logo.jpg',
         # bad:
         'https://i.redd.it/tm0ulqcxn2gx.jpg',
         'https://i.redd.it/t6favcxj9agx.jpg',
         'https://i.redd.it/7x5l6pdhtagx.jpg',
         'http://i.imgur.com/qN962rH.jpg',
+        'http://i.kinja-img.com/gawker-media/image/upload/s---zKMfGT0--/c_scale,fl_progressive,q_80,w_800/19fk32sw3nt1wjpg.jpg'
     ]
     for url in urls:
-        get_image(url)
+        try:
+            get_image(url)
+        except:
+            print(
+                "Unable to download image {}. "
+                "This is a convenience message because it's likely "
+                "the hardcoded image selection will disappear.".format(url))
 
 
 def convert_all_inputdir_files():
@@ -115,5 +122,7 @@ def main():
     download_images()
     convert_all_inputdir_files()
 
+
 if __name__ == '__main__':
+    # TODO GREG add some argument parsing
     main()
