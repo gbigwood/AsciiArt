@@ -3,6 +3,7 @@ import numpy as np
 import requests
 import shutil
 import os
+import argparse
 from urllib.parse import urlparse
 
 
@@ -11,20 +12,20 @@ class AsciiConverter:
     GSCALE1 = '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^`\'. '
     GSCALE2 = "@%#*+=-:. "
 
-    def __init__(self, seventy_shades_of_grey=True):
-        self.num_columns = 100
+    def __init__(self, seventy_shades_of_grey, num_columns):
+        self.num_columns = num_columns
         self.scale = 0.43  # Good default ratio of w/h for Courier font
         self.seventy_shades_of_grey = seventy_shades_of_grey
 
     def convert_image_to_greyscale(self, filename):
         self.image = Image.open(filename).convert("L")
         self.image_width, self.image_height = self.image.size[0], self.image.size[1]
-        self.tile_width = self.image_width / self.num_columns  # Scale to desired output width
-        self.tile_height = self.tile_width / self.scale  # Scale due to ratio and scale of the font
-        self.rows = int(self.image_height / self.tile_height)  # Number of rows in the final grid
+        self.tile_width = self.image_width/self.num_columns  # Scale to desired output width
+        self.tile_height = self.tile_width/self.scale  # Scale due to ratio and scale of the font
+        self.rows = int(self.image_height/self.tile_height)  # Number of rows in the final grid
 
     def get_average_luminosity(self, image):
-        image_array = np.array(image)  # 2D array of brightness
+        image_array = np.array(image)  # 2D Array of brightness
         width, height = image_array.shape
         return np.average(image_array.reshape(width * height))  # Resize to flat array then compute average brightness
 
@@ -44,7 +45,7 @@ class AsciiConverter:
             for i in range(self.num_columns):
                 x1 = int(i * self.tile_width)
                 x2 = int((i + 1) * self.tile_width)
-                # correct the last tile 
+                # correct the last tile
                 if i == self.num_columns - 1:
                     x2 = self.image_width
 
@@ -67,8 +68,8 @@ class AsciiConverter:
                 f.write(row + '\n')
 
 
-def do_convert(input_filename, output_filename, seventy_shades_of_grey=False):
-    converter = AsciiConverter(seventy_shades_of_grey=seventy_shades_of_grey)
+def do_convert(input_filename, output_filename, width=80, seventy_shades_of_grey=False):
+    converter = AsciiConverter(seventy_shades_of_grey, width)
     converter.convert_image_to_greyscale(input_filename)
     ascii_image = converter.generate_ascii_content_of_image()
     converter.write_to_text_file(ascii_image, output_filename)
@@ -85,7 +86,7 @@ def get_image(url):
 
 
 def download_images():
-    urls = [  # TODO GREG input folder or arguments
+    urls = [
         # good:
         'https://i.redd.it/707zkx33v1gx.jpg',
         'https://pixabay.com/static/uploads/photo/2013/08/11/19/37/flower-171644_960_720.jpg',
@@ -108,21 +109,23 @@ def download_images():
                 "the hardcoded image selection will disappear.".format(url))
 
 
-def convert_all_inputdir_files():
+def convert_all_inputdir_files(width):
     for _, _, files in os.walk('input/'):
         for filename in files:
             print("Converting: ", filename)
             input_filename = 'input/' + filename
             output_filename = "output/" + filename.split(".")[0].replace(" ", "_")
-            do_convert(input_filename, output_filename + "_10.txt", False)
-            do_convert(input_filename, output_filename + "_70.txt", True)
+            do_convert(input_filename, output_filename + "_10.txt", width, False)
+            do_convert(input_filename, output_filename + "_70.txt", width, True)
 
 
-def main():
+def main(args):
     download_images()
-    convert_all_inputdir_files()
+    convert_all_inputdir_files(args.width)
 
 
 if __name__ == '__main__':
-    # TODO GREG add some argument parsing
-    main()
+    parser = argparse.ArgumentParser(description='Create AsciiArt from images.')
+    parser.add_argument('--width', nargs="?", metavar='w', default=80, type=int, help='An integer width for the output image.')
+    args = parser.parse_args()
+    main(args)
