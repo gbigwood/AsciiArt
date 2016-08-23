@@ -85,7 +85,7 @@ def get_image(url):
     return filename
 
 
-def download_images():
+def download_images(extra_urls):
     urls = [
         # good:
         'https://i.redd.it/707zkx33v1gx.jpg',
@@ -99,7 +99,8 @@ def download_images():
         'http://i.imgur.com/qN962rH.jpg',
         'http://i.kinja-img.com/gawker-media/image/upload/s---zKMfGT0--/c_scale,fl_progressive,q_80,w_800/19fk32sw3nt1wjpg.jpg'
     ]
-    for url in urls:
+
+    for url in urls + extra_urls:
         try:
             get_image(url)
         except:
@@ -120,12 +121,13 @@ def convert_all_inputdir_files(width):
 
 
 def main(args):
-    download_images()
+    download_images(args.urls)
     convert_all_inputdir_files(args.width)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create AsciiArt from images.')
+    parser.add_argument('urls', default=[], type=str, nargs='*', help='Urls of images to use.')
     parser.add_argument('--width', nargs="?", metavar='w', default=80, type=int, help='An integer width for the output image.')
     args = parser.parse_args()
     main(args)

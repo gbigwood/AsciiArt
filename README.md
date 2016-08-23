@@ -4,6 +4,38 @@ Convert Images to ascii art
 Modified example taken from the example in the excellent book 'Python Playground: Geeky Projects for the Curious Programmer'
 by Mahesh Venkitachalam https://www.nostarch.com/pythonplayground.
 
+## Install
+
+Please use python3.
+
+Install the requirements:
+
+```
+pip install -r requirements.txt
+```
+
+## Run
+
+The program looks in the `input` folder for images to convert and writes to the `output` folder.
+
+To Run:
+
+```
+python ascii_art.py --width=100
+```
+
+Width has a default value of 80 if not specified.
+
+An optional list of images to download can be provided like so:
+
+```
+python ascii_art.py --w=120 'http://i.imgur.com/48fss41.jpg' 'http://i.imgur.com/6dyNsZH.jpg' 'http://i.imgur.com/cP6B8XA.jpg' 'http://i.imgur.com/8wNH11i.jpg'
+```
+
+The images will be saved into the input folder based on name for later use to avoid re-downloading the image..
+
+
+## Example output
 
 Obligatory cat example:
 
@@ -56,3 +88,4 @@ Obligatory cat example:
 +++++++++++=============++++========++++++++++++=+++++++++++++++++++++++++++=============-------+***
 
 ```
+
